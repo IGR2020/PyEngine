@@ -19,7 +19,6 @@ class Button(pygame.Rect):
         x, y = pos
         width, height = image.get_width() * scale, image.get_height() * scale
         super().__init__(x, y, width, height)
-        self.scale = 1
         self.image = pygame.transform.scale(image, (width, height))
         if len(args) == 1:
             self.info = args[0]

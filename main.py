@@ -7,13 +7,14 @@ window_width, window_height = window.get_size()
 pg.display.set_caption("PyEngine")
 
 # assets
-object_button_width = 64
-object_button_height = 72
+button_width = 64
+button_height = 72
 object_button_assets = load_assets(
-    "assets/Buttons", (object_button_width, object_button_height), 2
+    "assets/Object Buttons", (button_width, button_height), 2
 )
 
 object_assets = load_assets("assets/Object Assets", None, 2)
+button_assets = load_assets("assets/Buttons", (button_width, button_height), 2)
 
 # decorational
 object_button_div_rect = pg.Rect(0, window_height * 0.7, window_width, 5)
@@ -28,7 +29,7 @@ for asset in object_button_assets:
     object_buttons.append(
         Button(
             (
-                i * object_button_width + i * object_button_spacing,
+                i * button_width + i * object_button_spacing,
                 object_button_div_rect.bottom,
             ),
             object_button_assets[asset],
@@ -47,6 +48,11 @@ clock = pg.time.Clock()
 # GUI movement and selection
 selected_object_button = None
 selected_object = None
+upload_button_clicked = True
+
+
+# Creation of project
+upload_button = Button((window_width-button_width, 0), button_assets["Upload"])
 
 
 def display():
@@ -65,6 +71,8 @@ def display():
     # added objects
     for obj in objects:
         obj.display(window)
+
+    upload_button.display(window)
 
     pg.display.update()
 
@@ -88,19 +96,28 @@ while run:
                     selected_object = i
 
             for i, button in enumerate(object_buttons):
-                if button.collidepoint(mouse_x, mouse_y):
+                if button.clicked():
                     button.image = object_button_assets[button.info + " Pressed"]
-                    button.y += object_button_height - object_button_width
+                    button.y += button_height - button_width
                     selected_object_button = i
 
+            if upload_button.clicked():
+                upload_button.image = button_assets["Upload Pressed"]
+                upload_button.y += button_height - button_width
+                upload_button_clicked = True
+
         if event.type == pg.MOUSEBUTTONUP:
+            if upload_button_clicked:
+                upload_button.image = button_assets["Upload"]
+                upload_button.y -= button_height - button_width
+                upload_button_clicked = False
             if selected_object_button is not None:
                 objects.append(
                     Button(
                         (window_width / 2, window_height / 4),
                         object_assets["Blank Button"],
                         1,
-                        "Blank Button"
+                        {"Asset": "Blank Button", "Scale": 1, "Type": "Button"}
                     )
                 )
 
@@ -108,7 +125,7 @@ while run:
                     object_buttons[selected_object_button].info
                 ]
                 object_buttons[selected_object_button].y -= (
-                    object_button_height - object_button_width
+                    button_height - button_width
                 )
                 selected_object_button = None
 
