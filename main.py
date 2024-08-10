@@ -1,5 +1,5 @@
 import pygame as pg
-from engineFunctions import load_assets, Button
+from engineFunctions import load_assets, Button, blit_text
 from objectConverter import *
 
 window = pg.display.set_mode((1000, 600), flags=pg.RESIZABLE)
@@ -79,6 +79,8 @@ def display():
 
     upload_button.display(window)
 
+    blit_text(window, project_name, (0, 0), (120, 120, 120), 30)
+
     pg.display.update()
 
 
@@ -131,7 +133,7 @@ while run:
                         (window_width / 2, window_height / 4),
                         object_assets["Blank Button"],
                         1,
-                        {"Asset": "Blank Button", "Scale": 1, "Type": "Button", "Info": ()}
+                        {"Asset": "Blank Button", "Scale": 1, "Type": "Button", "Info": "'Blank Button'"}
                     )
                 )
 

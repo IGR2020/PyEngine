@@ -54,12 +54,61 @@ def saveGUIObjects(objects, path):
     sortedObjects = sortConvertedGUIObject(usableConvertedObjects)
     saveConvertedObjects((loadableConvertedObjects, *sortedObjects), path)
 
-def createStarterScript(path):
+def createStarterScript(path, name):
     with open(path, "w") as file:
         file.write("")
         file.close()
     with open(path, "a") as file:
-        file.write("import pygame as pg\nfrom objects import *")
+        file.write(f"""
+import pygame as pg
+from objects import *
+
+window = pg.display.set_mode()
+window_width, window_height = window.get_size()
+pg.display.set_caption('{name}')
+
+clock = pg.time.Clock()
+fps = 60
+run = True
+
+selected_button = None
+
+def display():
+    window.fill((255, 255, 255))
+
+    for button in buttons:
+        button.display(window)
+
+    pg.display.update()
+
+while run:
+    
+    clock.tick(fps)
+
+    for event in pg.event.get():
+
+        if event.type == pg.QUIT:
+            run = False
+
+        if event.type == pg.MOUSEBUTTONDOWN:
+            for i, button in enumerate(buttons):
+                if button.clicked():
+                    button.image = object_assets[button.info + " Pressed"]
+                    selected_button = i
+                    button.y += 8
+
+        if event.type == pg.MOUSEBUTTONUP:
+            
+            if selected_button is not None:
+                buttons[selected_button].image = object_assets[buttons[selected_button].info]
+                buttons[selected_button].y -= 8
+                selected_button = None
+
+    display()
+
+pg.quit()
+quit()
+                   """)
 
 def createStarterObjectScript(path):
     with open(path, "w") as file:
@@ -83,6 +132,7 @@ def createEnvironment(name):
     shutil.copy("engineFunctions.py", f"{name}/")
 
     createStarterObjectScript(f"{name}/objects.py")
+    createStarterScript(f"{name}/main.py", name)
 
 
     
