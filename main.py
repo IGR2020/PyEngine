@@ -1,7 +1,8 @@
 import pygame as pg
 from engineFunctions import load_assets, Button
+from objectConverter import *
 
-window = pg.display.set_mode((1000, 600))
+window = pg.display.set_mode((1000, 600), flags=pg.RESIZABLE)
 window_width, window_height = window.get_size()
 
 pg.display.set_caption("PyEngine")
@@ -48,11 +49,15 @@ clock = pg.time.Clock()
 # GUI movement and selection
 selected_object_button = None
 selected_object = None
-upload_button_clicked = True
+upload_button_clicked = False
 
 
 # Creation of project
 upload_button = Button((window_width-button_width, 0), button_assets["Upload"])
+project_name = "TestProject"
+if not isdir(project_name):
+    createEnvironment(project_name)
+exec(f"from {project_name}.objects import objects")
 
 
 def display():
@@ -107,10 +112,19 @@ while run:
                 upload_button_clicked = True
 
         if event.type == pg.MOUSEBUTTONUP:
+
             if upload_button_clicked:
+
+                # button reseting
                 upload_button.image = button_assets["Upload"]
                 upload_button.y -= button_height - button_width
                 upload_button_clicked = False
+
+                # saving GUI objects
+                saveGUIObjects(objects, f"{project_name}/objects.py")
+
+
+
             if selected_object_button is not None:
                 objects.append(
                     Button(
