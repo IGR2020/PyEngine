@@ -6,16 +6,38 @@ def convertGUIObject(object):
     info = object.info
     object_pos = object.topleft
     if info["Type"] == "Button":
-        return f"Button({object_pos}, object_assets['{info["Asset"]}'], {info["Scale"]})" 
+        return f"Button({object_pos}, object_assets['{info["Asset"]}'], {info["Scale"]}, {info})", f"Button({object_pos}, object_assets['{info["Asset"]}'], {info["Scale"]}, {info["Info"]})"
     raise Exception("Invalid Object Type")
 
 def convertGUIObjects(objects):
-    convertedObjects = "objects = [\n"
+    loadableConvertedObjects = "objects = [\n"
+    usableConvertedObjects = "objects = [\n"
+    
     for obj in objects:
-        convertedObjects += convertGUIObject(obj) + ",\n"
-    convertedObjects += "]\n"
+        loadable_obj, usable_obj  = convertGUIObject(obj)
+        loadableConvertedObjects += loadable_obj + ",\n"
+        usableConvertedObjects += usable_obj + ",\n"
 
-    return convertedObjects
+    loadableConvertedObjects += "]\n"
+    usableConvertedObjects += "]\n"
+
+    return loadableConvertedObjects, usableConvertedObjects
+
+def sortConvertedGUIObject(convertedObject: str):
+    objects = convertedObject.splitlines()
+    objects.pop(0)
+    objects.pop(-1)
+
+    buttonObjects = "buttons = [\n"
+
+    for obj in objects:
+        if "Button" in obj:
+            buttonObjects += obj + "\n"
+    
+    buttonObjects += "]\n"
+
+    return (buttonObjects,)
+
 
 def saveConvertedObjects(convertedObjects, path):
     with open(path, "w") as file:
@@ -28,8 +50,9 @@ def saveConvertedObjects(convertedObjects, path):
         file.close()
 
 def saveGUIObjects(objects, path):
-    convertedObjects = convertGUIObjects(objects)
-    saveConvertedObjects(convertedObjects, path)
+    loadableConvertedObjects, usableConvertedObjects = convertGUIObjects(objects)
+    sortedObjects = sortConvertedGUIObject(usableConvertedObjects)
+    saveConvertedObjects((loadableConvertedObjects, *sortedObjects), path)
 
 def createStarterScript(path):
     with open(path, "w") as file:

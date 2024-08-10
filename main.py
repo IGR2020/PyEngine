@@ -131,7 +131,7 @@ while run:
                         (window_width / 2, window_height / 4),
                         object_assets["Blank Button"],
                         1,
-                        {"Asset": "Blank Button", "Scale": 1, "Type": "Button"}
+                        {"Asset": "Blank Button", "Scale": 1, "Type": "Button", "Info": ()}
                     )
                 )
 
