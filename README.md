@@ -4,3 +4,4 @@ This is a simple app to make GUI for pygame apps easily and to add other feature
 # Features
 + Button object
 + Saving and loading GUI objects
++ Basic game script upon project creation
