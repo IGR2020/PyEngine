@@ -13,14 +13,16 @@ object_button_assets = load_assets(
     "assets/Buttons", (object_button_width, object_button_height), 2
 )
 
+object_assets = load_assets("assets/Object Assets", None, 2)
+
 # decorational
-object_button_div_rect = pg.Rect(0, window_height * 0.6, window_width, 5)
+object_button_div_rect = pg.Rect(0, window_height * 0.7, window_width, 5)
 
 # buttons
 object_button_spacing = 5
 object_buttons = []
 i = 0
-for  asset in object_button_assets:
+for asset in object_button_assets:
     if "Pressed" in asset:
         continue
     object_buttons.append(
@@ -31,26 +33,38 @@ for  asset in object_button_assets:
             ),
             object_button_assets[asset],
             1,
-            asset
+            asset,
         )
     )
     i += 1
+
+objects = []
 
 run = True
 engine_fps = 60
 clock = pg.time.Clock()
 
+# GUI movement and selection
+selected_object_button = None
+selected_object = None
+
 
 def display():
-    window.fill((0, 0, 0))
+    window.fill((30, 30, 30))
 
     # color coding
-    pg.draw.rect(window, (40, 40, 40), object_button_div_rect)
-    window.fill((30, 30, 30), (0, object_button_div_rect.bottom, window_width, window_height))
+    pg.draw.rect(window, (80, 80, 80), object_button_div_rect)
+    window.fill(
+        (60, 60, 60), (0, object_button_div_rect.bottom, window_width, window_height)
+    )
 
     # object buttons
     for button in object_buttons:
         button.display(window)
+
+    # added objects
+    for obj in objects:
+        obj.display(window)
 
     pg.display.update()
 
@@ -69,6 +83,10 @@ while run:
 
             mouse_x, mouse_y = pg.mouse.get_pos()
 
+            for i, obj in enumerate(objects):
+                if obj.collidepoint((mouse_x, mouse_y)):
+                    selected_object = i
+
             for i, button in enumerate(object_buttons):
                 if button.collidepoint(mouse_x, mouse_y):
                     button.image = object_button_assets[button.info + " Pressed"]
@@ -76,8 +94,34 @@ while run:
                     selected_object_button = i
 
         if event.type == pg.MOUSEBUTTONUP:
-            object_buttons[selected_object_button].image = object_button_assets[object_buttons[selected_object_button].info]
-            button.y -= object_button_height - object_button_width
+            if selected_object_button is not None:
+                objects.append(
+                    Button(
+                        (window_width / 2, window_height / 4),
+                        object_assets["Blank Button"],
+                        1,
+                        "Blank Button"
+                    )
+                )
+
+                object_buttons[selected_object_button].image = object_button_assets[
+                    object_buttons[selected_object_button].info
+                ]
+                object_buttons[selected_object_button].y -= (
+                    object_button_height - object_button_width
+                )
+                selected_object_button = None
+
+            if selected_object is not None:
+                selected_object is None
+
+    mouse_rel_x, mouse_rel_y = pg.mouse.get_rel()
+    left_mouse_button_down = pg.mouse.get_pressed()[0]
+    if left_mouse_button_down:
+        if selected_object is not None:
+            objects[selected_object].x += mouse_rel_x
+            objects[selected_object].y += mouse_rel_y
+
     display()
 
 pg.quit()
