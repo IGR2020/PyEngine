@@ -66,7 +66,7 @@ def createAssetsFile(path):
     with open(path, "a") as file:
         file.write("""
 from engineFunctions import load_assets
-object_assets = load_assets("assets/Object Assets", None, 2)
+assets = load_assets("assets/Object Assets", None, 2)
 """)
         file.close()
 
