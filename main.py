@@ -6,7 +6,7 @@ from os.path import isdir
 from assets import *
 
 
-window = pg.display.set_mode((1000, 600), flags=pg.RESIZABLE)
+window = pg.display.set_mode((1028, 600), flags=pg.RESIZABLE)
 window_width, window_height = window.get_size()
 
 game_width, game_height = 900, 500
@@ -47,7 +47,7 @@ clock = pg.time.Clock()
 selected_object = None
 
 # Creation of project
-upload_button = Button((window_width-button_width, 0), "Upload", "Upload Pressed")
+upload_button = Button((command_actions_div_rect.right, 0), "Upload", "Upload Pressed")
 project_name = "TestProject"
 if not isdir(project_name):
     createEnvironment(project_name)
@@ -94,6 +94,9 @@ while run:
 
         if event.type == pg.QUIT:
             run = False
+
+        if event.type == pg.VIDEORESIZE:
+            window_width, window_height = event.dict["size"]
 
         if event.type == pg.MOUSEBUTTONDOWN:
 
