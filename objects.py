@@ -109,3 +109,43 @@ class Button(Package):
             self.rect.y -= self.height_diffrence
             return True
         return False
+
+class Text(Package):
+    def __init__(self, text, x, y, color, size, font,  center, centerx, centery) -> None:
+
+        # saving reconstruction data
+        super().__init__()
+        self.text = text
+        self.color = color
+        self.size = size
+        self.font = font
+
+        # creating text surface
+        font_style = pg.font.SysFont(self.font, self.size)
+        text_surface = font_style.render(self.text, True, self.color)
+        if center:
+            x -= text_surface.get_width() // 2
+            y -= text_surface.get_height() // 2
+        else:
+            if centerx:
+                x -= text_surface.get_width() // 2
+            if centery:
+                y -= text_surface.get_height() // 2
+
+        self.image = text_surface
+        self.rect = text_surface.get_rect(topleft=(x, y))
+
+    def pack(self, window_width, window_height):
+        self.image = self.text
+        return super().pack(window_width, window_height)
+    
+    def unpack(self, window_width, window_height):
+        font_style = pg.font.SysFont(self.font, self.size)
+        text_surface = font_style.render(self.text, True, self.color)
+
+        self.image = text_surface
+
+        return super().unpack(window_width, window_height)
+    
+    def display(self, window):
+        window.blit(self.image, self.rect)
