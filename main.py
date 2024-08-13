@@ -107,6 +107,9 @@ while run:
             for i, obj in enumerate(objects):
                 if obj.rect.collidepoint((mouse_x, mouse_y)):
                     selected_object = i
+                    break
+            else:
+                selected_object = None
 
         if event.type == pg.MOUSEBUTTONUP:
 
@@ -127,6 +130,8 @@ while run:
     upload_button.clicked()
 
     for button in object_buttons:
+        if selected_object is not None:
+            continue
         button.clicked()
 
     # button released
@@ -145,7 +150,8 @@ while run:
 
 
     for button in object_buttons:
-        if button.released():
+        if button.released() and selected_object is None:
+            print(selected_object)
             if button.info == "Button":
                 objects.append(
                     Button(
@@ -177,6 +183,8 @@ while run:
 
     # button pressed update
     for button in object_buttons:
+        if selected_object is not None:
+            continue
         button.pressed()
 
     upload_button.pressed()

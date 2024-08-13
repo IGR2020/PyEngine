@@ -143,6 +143,7 @@ class Text(Package):
     
     def unpack(self, window_width, window_height):
         self.reload()
+        self.rect = self.image.get_rect(topleft=self.rect.topleft)
 
         return super().unpack(window_width, window_height)
     
