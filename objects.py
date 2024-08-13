@@ -144,7 +144,6 @@ class Text(Package):
         text_surface = font_style.render(self.text, True, self.color)
 
         self.image = text_surface
-        print("hello?")
 
         return super().unpack(window_width, window_height)
     
