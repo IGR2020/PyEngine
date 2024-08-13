@@ -1,54 +1,50 @@
 import pygame as pg
 from os import listdir
 from os.path import join, isfile, isdir
+import pickle
+
+def save_data(data, path):
+    with open(path, "wb") as file:
+        pickle.dump(data, file)
+        file.close()
+
+def load_data(path):
+    with open(path, "rb") as file:
+        data = pickle.load(file)
+        file.close()
+    return data
+
 
 pg.font.init()
 
 
-pg.font.init()
-
-def blit_text(win, text, pos, colour=(0, 0, 0), size=30, font="arialblack", blit=True, centerx=False, centery=False, center=False):
+def blit_text(
+    win,
+    text,
+    pos,
+    colour=(0, 0, 0),
+    size=30,
+    font="arialblack",
+    blit=True,
+    centerx=False,
+    centery=False,
+    center=False,
+):
     text = str(text)
     x, y = pos
     font_style = pg.font.SysFont(font, size)
     text_surface = font_style.render(text, True, colour)
     if center:
-        x -= text_surface.get_width()//2
-        y -= text_surface.get_height()//2
+        x -= text_surface.get_width() // 2
+        y -= text_surface.get_height() // 2
     else:
         if centerx:
-            x -= text_surface.get_width()//2
+            x -= text_surface.get_width() // 2
         if centery:
-            y -= text_surface.get_height()//2
+            y -= text_surface.get_height() // 2
     if blit:
         win.blit(text_surface, (x, y))
     return text_surface
-
-
-class Button(pg.Rect):
-    def __init__(self, pos, image, scale=1, *args):
-        x, y = pos
-        width, height = image.get_width() * scale, image.get_height() * scale
-        super().__init__(x, y, width, height)
-        self.image = pg.transform.scale(image, (width, height))
-        if len(args) == 1:
-            self.info = args[0]
-        else:
-            self.info = args
-
-    def clicked(self):
-        pos = pg.mouse.get_pos()
-        if self.collidepoint(pos):
-            return True
-        return False
-
-    def display(self, win, background=None):
-        """
-        background can be any RGB value
-        """
-        if background is not None:
-            pg.draw.rect(win, background, self)
-        win.blit(self.image, self)
 
 
 def load_assets(path, size: int = None, scale: float = None, getSubDirsAsList=False):
@@ -86,9 +82,7 @@ def load_assets_list(path, size: int = None, scale: float = None):
                 pg.transform.scale_by(pg.image.load(join(path, file)), scale)
             )
         else:
-            sprites.append(
-                pg.transform.scale(pg.image.load(join(path, file)), size)
-            )
+            sprites.append(pg.transform.scale(pg.image.load(join(path, file)), size))
     return sprites
 
 
