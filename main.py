@@ -113,6 +113,16 @@ while run:
             if selected_object is not None:
                 selected_object is None
 
+        if event.type == pg.KEYDOWN:
+            if selected_object is not None and objects[selected_object].type == "Text":
+                if event.key == pg.K_BACKSPACE:
+                    objects[selected_object].text = objects[selected_object].text[:-1]
+                else:
+                    objects[selected_object].text += event.unicode
+
+                objects[selected_object].reload()
+                
+
     # button animation
     upload_button.clicked()
 

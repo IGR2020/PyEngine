@@ -142,12 +142,15 @@ class Text(Package):
         return super().pack(window_width, window_height)
     
     def unpack(self, window_width, window_height):
-        font_style = pg.font.SysFont(self.font, self.size)
-        text_surface = font_style.render(self.text, True, self.color)
-
-        self.image = text_surface
+        self.reload()
 
         return super().unpack(window_width, window_height)
     
+    def reload(self):
+        font_style = pg.font.SysFont(self.font, self.size)
+        text_surface = font_style.render(self.text, True, self.color)
+
+        self.image = text_surface        
+
     def display(self, window):
         window.blit(self.image, self.rect)
