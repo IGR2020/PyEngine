@@ -37,7 +37,6 @@ for asset in object_button_assets:
     )
     i += 1
 
-objects = []
 
 run = True
 engine_fps = 60
@@ -56,6 +55,9 @@ try:
     objects = load_data(f"{project_name}/objects.pkl")
 except:
     objects = []
+
+for obj in objects:
+    obj.unpack(game_width, game_height)
 
 def display():
     window.fill((30, 30, 30))
@@ -142,6 +144,15 @@ while run:
                         "Blank Button Pressed",
                         )
                     )
+                
+            if button.info == "Text":
+                objects.append(
+                    Text(
+                        "Abc",
+                        game_width/2, game_height/2, (200, 120, 120), 30, "ArialBlack", True
+
+                    )
+                )
             break
 
 

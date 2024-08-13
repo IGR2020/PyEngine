@@ -111,7 +111,7 @@ class Button(Package):
         return False
 
 class Text(Package):
-    def __init__(self, text, x, y, color, size, font,  center, centerx, centery) -> None:
+    def __init__(self, text, x, y, color, size, font,  center=False, centerx=False, centery=False) -> None:
 
         # saving reconstruction data
         super().__init__()
@@ -144,6 +144,7 @@ class Text(Package):
         text_surface = font_style.render(self.text, True, self.color)
 
         self.image = text_surface
+        print("hello?")
 
         return super().unpack(window_width, window_height)
     
