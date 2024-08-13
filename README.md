@@ -1,5 +1,5 @@
 # About
-This is a simple app to make GUI for pygame apps easily and to add other features as well, and to make creating games in general easy.
+This is a simple app to make GUI for pygame apps easily and to add other features as well, and to make creating games in generaly easy, and to add GUI functionality to pygame.
 
 # Features
 ## Beta 1
