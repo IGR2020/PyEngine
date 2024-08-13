@@ -134,6 +134,8 @@ class Text(Package):
 
         self.image = text_surface
         self.rect = text_surface.get_rect(topleft=(x, y))
+        
+        self.type = "Text"
 
     def pack(self, window_width, window_height):
         self.image = self.text
