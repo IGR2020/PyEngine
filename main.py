@@ -6,10 +6,10 @@ from os.path import isdir
 from assets import *
 
 
-window = pg.display.set_mode((1028, 600), flags=pg.RESIZABLE)
+window = pg.display.set_mode((1300, 800), flags=pg.RESIZABLE)
 window_width, window_height = window.get_size()
 
-game_width, game_height = 900, 500
+game_width, game_height = 1200, 700
 
 pg.display.set_caption("PyEngine")
 

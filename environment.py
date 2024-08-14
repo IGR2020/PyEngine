@@ -18,7 +18,10 @@ window = pg.display.set_mode()
 window_width, window_height = window.get_size()
 pg.display.set_caption('{name}')
 
-objects = load_data("objects.pkl")
+try:
+    objects = load_data("objects.pkl")
+except:
+    objects = load_data("{name}/objects.pkl")
 for obj in objects:
     obj.unpack(window_width, window_height)
 
