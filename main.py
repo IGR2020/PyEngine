@@ -45,8 +45,11 @@ clock = pg.time.Clock()
 # GUI movement and selection
 selected_object = None
 
-# Creation of project
+# action buttons
 upload_button = Button((command_actions_div_rect.right, 0), "Upload", "Upload Pressed")
+delete_button = Button((upload_button.rect.right, 0), "Trash", "Trash Pressed")
+
+# Creation of project
 project_name = "TestProject"
 if not isdir(project_name):
     createEnvironment(project_name)
@@ -62,7 +65,11 @@ for obj in objects:
 def display():
     window.fill((30, 30, 30))
 
-    # color coding
+    # game objects
+    for obj in objects:
+        obj.display(window)
+
+    # color coding & border layout
     pg.draw.rect(window, (80, 80, 80), object_button_div_rect)
     pg.draw.rect(window, (80, 80, 80), command_actions_div_rect)
     window.fill(
@@ -76,11 +83,8 @@ def display():
     for button in object_buttons:
         button.display(window)
 
-    # added objects
-    for obj in objects:
-        obj.display(window)
-
     upload_button.display(window)
+    delete_button.display(window)
 
     blit_text(window, project_name, (0, 0), (120, 120, 120), 30)
 
@@ -91,6 +95,14 @@ def display():
 while run:
 
     clock.tick(engine_fps)
+
+
+    # delete button
+    delete_button.clicked()
+    if delete_button.released():
+        if selected_object is not None:
+            objects.pop(selected_object)
+    delete_button.pressed()
 
     for event in pg.event.get():
 
@@ -105,16 +117,13 @@ while run:
             mouse_x, mouse_y = pg.mouse.get_pos()
 
             for i, obj in enumerate(objects):
+                if delete_button.rect.collidepoint((mouse_x, mouse_y)):
+                    break
                 if obj.rect.collidepoint((mouse_x, mouse_y)):
                     selected_object = i
                     break
             else:
                 selected_object = None
-
-        if event.type == pg.MOUSEBUTTONUP:
-
-            if selected_object is not None:
-                selected_object is None
 
         if event.type == pg.KEYDOWN:
             if selected_object is not None and objects[selected_object].type == "Text":
