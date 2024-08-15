@@ -9,14 +9,16 @@ from assets import *
 window = pg.display.set_mode((1000, 600), flags=pg.RESIZABLE)
 window_width, window_height = window.get_size()
 
-game_width, game_height = 1000, window_width/16*9
+game_width, game_height = 1000, window_width / 16 * 9
 
 pg.display.set_caption("PyEngine")
 
 # decorational
-command_actions_div_rect = pg.Rect(game_width+1, 0, 5, window_height)
-object_button_div_rect = pg.Rect(0, game_height+1, command_actions_div_rect.left, 5)
-config_menu_div_rect = pg.Rect(game_width+1, command_actions_div_rect.centery, window_width, 5)
+command_actions_div_rect = pg.Rect(game_width + 1, 0, 5, window_height)
+object_button_div_rect = pg.Rect(0, game_height + 1, command_actions_div_rect.left, 5)
+config_menu_div_rect = pg.Rect(
+    game_width + 1, command_actions_div_rect.centery, window_width, 5
+)
 
 # buttons
 object_button_spacing = 5
@@ -49,7 +51,9 @@ selected_object = None
 # action buttons
 upload_button = Button((command_actions_div_rect.right, 0), "Upload", "Upload Pressed")
 delete_button = Button((upload_button.rect.right, 0), "Trash", "Trash Pressed")
-update_project_button = Button((upload_button.rect.x, upload_button.rect.bottom-8), "Sync", "Sync Pressed")
+update_project_button = Button(
+    (upload_button.rect.x, upload_button.rect.bottom - 8), "Sync", "Sync Pressed"
+)
 
 # Creation of project
 project_name = "TestProject"
@@ -64,8 +68,21 @@ except:
 for obj in objects:
     obj.unpack(game_width, game_height)
 
+
 def display():
-    window.fill((30, 30, 30))
+    window.fill((20, 20, 20))
+
+    # selected object highlight
+    if selected_object is not None:
+        window.fill(
+            (30, 30, 30),
+            (
+                objects[selected_object].rect.x - 10,
+                objects[selected_object].rect.y - 10,
+                objects[selected_object].rect.width + 20,
+                objects[selected_object].rect.height + 20,
+            ),
+        )
 
     # game objects
     for obj in objects:
@@ -79,10 +96,17 @@ def display():
         (60, 60, 60), (0, object_button_div_rect.bottom, window_width, window_height)
     )
     window.fill(
-        (60, 60, 60), (command_actions_div_rect.right, 0, window_width, config_menu_div_rect.y)
+        (60, 60, 60),
+        (command_actions_div_rect.right, 0, window_width, config_menu_div_rect.y),
     )
     window.fill(
-        (50, 50, 50), (command_actions_div_rect.right, config_menu_div_rect.bottom, window_width, window_height)
+        (50, 50, 50),
+        (
+            command_actions_div_rect.right,
+            config_menu_div_rect.bottom,
+            window_width,
+            window_height,
+        ),
     )
 
     # object buttons
@@ -102,7 +126,6 @@ def display():
 while run:
 
     clock.tick(engine_fps)
-
 
     # delete button
     delete_button.clicked()
@@ -140,7 +163,6 @@ while run:
                     objects[selected_object].text += event.unicode
 
                 objects[selected_object].reload()
-                
 
     # button animation
     upload_button.clicked()
@@ -168,7 +190,6 @@ while run:
         for obj in objects:
             obj.unpack(game_width, game_height)
 
-
     for button in object_buttons:
         if button.released() and selected_object is None:
             if button.info == "Button":
@@ -177,20 +198,22 @@ while run:
                         (window_width / 2, window_height / 4),
                         "Blank Button",
                         "Blank Button Pressed",
-                        )
                     )
-                
+                )
+
             if button.info == "Text":
                 objects.append(
                     Text(
                         "Abc",
-                        game_width/2, game_height/2, (200, 120, 120), 30, "ArialBlack", True
-
+                        game_width / 2,
+                        game_height / 2,
+                        (200, 120, 120),
+                        30,
+                        "ArialBlack",
+                        True,
                     )
                 )
             break
-
-
 
     # object movement
     mouse_rel_x, mouse_rel_y = pg.mouse.get_rel()
