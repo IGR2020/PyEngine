@@ -105,9 +105,14 @@ class Button(Package):
                 mouseDown = False
         else:
             mouseDown = mouseDown[clicked_button]
-        if self.rect.collidepoint((x, y)) and not mouseDown and self.is_pressed:
+        if not mouseDown and self.is_pressed:
+            print("no?")
             self.rect.y -= self.height_diffrence
             return True
+        if not self.rect.collidepoint((x, y)) and self.is_pressed:
+            print("yes")
+            self.rect.y -= self.height_diffrence
+            return False
         return False
 
 class Text(Package):

@@ -93,4 +93,19 @@ def createEnvironment(name):
     createAssetsFile(f"{name}/assets.py")
 
 
+def updateEnvironment(name):
+    """Expects valid file structure"""
+    
+    # copying assets
+    for file in listdir("assets/Object Assets"):
+        shutil.copy(f"assets/Object Assets/{file}", f"{name}/assets/Object Assets/")    
+
+    # copying files
+    shutil.copy("engineFunctions.py", f"{name}/")
+    shutil.copy("objects.py", f"{name}/")
+
+    createStarterScript(f"{name}/main.py", name)
+    createAssetsFile(f"{name}/assets.py")
+
+
     

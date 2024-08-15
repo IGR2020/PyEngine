@@ -6,16 +6,17 @@ from os.path import isdir
 from assets import *
 
 
-window = pg.display.set_mode((1300, 800), flags=pg.RESIZABLE)
+window = pg.display.set_mode((1000, 600), flags=pg.RESIZABLE)
 window_width, window_height = window.get_size()
 
-game_width, game_height = 1200, 700
+game_width, game_height = 1000, window_width/16*9
 
 pg.display.set_caption("PyEngine")
 
 # decorational
 command_actions_div_rect = pg.Rect(game_width+1, 0, 5, window_height)
 object_button_div_rect = pg.Rect(0, game_height+1, command_actions_div_rect.left, 5)
+config_menu_div_rect = pg.Rect(game_width+1, command_actions_div_rect.centery, window_width, 5)
 
 # buttons
 object_button_spacing = 5
@@ -48,6 +49,7 @@ selected_object = None
 # action buttons
 upload_button = Button((command_actions_div_rect.right, 0), "Upload", "Upload Pressed")
 delete_button = Button((upload_button.rect.right, 0), "Trash", "Trash Pressed")
+update_project_button = Button((upload_button.rect.x, upload_button.rect.bottom-8), "Sync", "Sync Pressed")
 
 # Creation of project
 project_name = "TestProject"
@@ -72,11 +74,15 @@ def display():
     # color coding & border layout
     pg.draw.rect(window, (80, 80, 80), object_button_div_rect)
     pg.draw.rect(window, (80, 80, 80), command_actions_div_rect)
+    pg.draw.rect(window, (80, 80, 80), config_menu_div_rect)
     window.fill(
         (60, 60, 60), (0, object_button_div_rect.bottom, window_width, window_height)
     )
     window.fill(
-        (60, 60, 60), (command_actions_div_rect.right, 0, window_width, window_height)
+        (60, 60, 60), (command_actions_div_rect.right, 0, window_width, config_menu_div_rect.y)
+    )
+    window.fill(
+        (50, 50, 50), (command_actions_div_rect.right, config_menu_div_rect.bottom, window_width, window_height)
     )
 
     # object buttons
@@ -85,6 +91,7 @@ def display():
 
     upload_button.display(window)
     delete_button.display(window)
+    update_project_button.display(window)
 
     blit_text(window, project_name, (0, 0), (120, 120, 120), 30)
 
@@ -137,13 +144,17 @@ while run:
 
     # button animation
     upload_button.clicked()
+    update_project_button.clicked()
 
     for button in object_buttons:
         if selected_object is not None:
-            continue
+            break
         button.clicked()
 
     # button released
+    if update_project_button.released():
+        updateEnvironment(project_name)
+
     if upload_button.released():
 
         # packing objects
@@ -160,7 +171,6 @@ while run:
 
     for button in object_buttons:
         if button.released() and selected_object is None:
-            print(selected_object)
             if button.info == "Button":
                 objects.append(
                     Button(
@@ -193,10 +203,11 @@ while run:
     # button pressed update
     for button in object_buttons:
         if selected_object is not None:
-            continue
+            break
         button.pressed()
 
     upload_button.pressed()
+    update_project_button.pressed()
 
     display()
 
