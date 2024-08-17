@@ -122,6 +122,33 @@ def display():
     pg.display.update()
 
 
+# button and shortcut key functionality
+# delete object
+def deleteObject():
+    global selected_object, objects
+    if selected_object is not None:
+        objects.pop(selected_object)
+        selected_object += 1
+        if selected_object >= len(objects):
+            selected_object = 0
+        if len(objects) == 0:
+            selected_object = None
+
+# saving object
+def saveObjects():
+    global objects
+    # packing objects
+    for obj in objects:
+        obj.pack(game_width, game_height)
+
+    # saving objects
+    save_data(objects, f"{project_name}/objects.pkl")
+
+    # unpacking objects
+    for obj in objects:
+        obj.unpack(game_width, game_height)
+
+
 # main script
 while run:
 
@@ -130,8 +157,7 @@ while run:
     # delete button
     delete_button.clicked()
     if delete_button.released():
-        if selected_object is not None:
-            objects.pop(selected_object)
+        deleteObject()
     delete_button.pressed()
 
     for event in pg.event.get():
@@ -156,13 +182,20 @@ while run:
                 selected_object = None
 
         if event.type == pg.KEYDOWN:
-            if selected_object is not None and objects[selected_object].type == "Text":
+            if selected_object is not None and objects[selected_object].type == "Text" and event.key != pg.K_DELETE and event.key != pg.K_ESCAPE:
                 if event.key == pg.K_BACKSPACE:
                     objects[selected_object].text = objects[selected_object].text[:-1]
                 else:
                     objects[selected_object].text += event.unicode
 
                 objects[selected_object].reload()
+                continue
+            elif event.key == pg.K_ESCAPE:
+                selected_object = None
+            elif event.key == pg.K_DELETE or event.key == pg.K_BACKSPACE:
+                deleteObject()
+            elif event.key == pg.K_s:
+                saveObjects()
 
     # button animation
     upload_button.clicked()
@@ -178,17 +211,7 @@ while run:
         updateEnvironment(project_name)
 
     if upload_button.released():
-
-        # packing objects
-        for obj in objects:
-            obj.pack(game_width, game_height)
-
-        # saving objects
-        save_data(objects, f"{project_name}/objects.pkl")
-
-        # unpacking objects
-        for obj in objects:
-            obj.unpack(game_width, game_height)
+        saveObjects()
 
     for button in object_buttons:
         if button.released() and selected_object is None:
@@ -211,6 +234,18 @@ while run:
                         30,
                         "ArialBlack",
                         True,
+                    )
+                )
+            if button.info == "TextBox":
+                objects.append(
+                    TextBox(
+                        "Blank TextBox",
+                        (1, 1),
+                        game_width/2,
+                        game_height/2,
+                        (200, 120, 120),
+                        30,
+                        "ArialBlack"
                     )
                 )
             break

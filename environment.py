@@ -16,12 +16,12 @@ from objects import *
 
 window = pg.display.set_mode()
 window_width, window_height = window.get_size()
-pg.display.set_caption('{name}')
+pg.display.set_caption('TestProject')
 
 try:
     objects = load_data("objects.pkl")
 except:
-    objects = load_data("{name}/objects.pkl")
+    objects = load_data("TestProject/objects.pkl")
 for obj in objects:
     obj.unpack(window_width, window_height)
 
@@ -47,12 +47,18 @@ while run:
 
         if event.type == pg.QUIT:
             run = False
+        
+        for obj in objects:
+            if obj.type == "TextBox":
+                obj.update_text(event)
 
     for obj in objects:
         if obj.type == "Button":
             obj.clicked()
             obj.released()
             obj.pressed()
+        if obj.type == "TextBox":
+            obj.select()
 
     display()
 

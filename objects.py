@@ -106,11 +106,9 @@ class Button(Package):
         else:
             mouseDown = mouseDown[clicked_button]
         if not mouseDown and self.is_pressed:
-            print("no?")
             self.rect.y -= self.height_diffrence
             return True
         if not self.rect.collidepoint((x, y)) and self.is_pressed:
-            print("yes")
             self.rect.y -= self.height_diffrence
             return False
         return False
@@ -144,19 +142,95 @@ class Text(Package):
 
     def pack(self, window_width, window_height):
         self.image = self.text
-        return super().pack(window_width, window_height)
+        Package.pack(self, window_width, window_height)
     
     def unpack(self, window_width, window_height):
         self.reload()
-        self.rect = self.image.get_rect(topleft=self.rect.topleft)
-
-        return super().unpack(window_width, window_height)
+        Package.unpack(self, window_width, window_height)
     
-    def reload(self):
+    def reload(self, reloadRect=True):
         font_style = pg.font.SysFont(self.font, self.size)
         text_surface = font_style.render(self.text, True, self.color)
 
-        self.image = text_surface        
+        self.image = text_surface
+
+        if reloadRect:
+            self.rect = self.image.get_rect(topleft=self.rect.topleft)        
 
     def display(self, window):
         window.blit(self.image, self.rect)
+
+class TextBox(Package):
+    def __init__(self,  imageName, border: tuple[int, int], x, y, color, size, font,  center=False) -> None:
+        
+        # saving reconstruction data
+        super().__init__()
+        self.text = "|"
+        self.color = color
+        self.size = size
+        self.font = font
+
+
+        self.boxImage = imageName
+        self.border = border
+
+        if center:
+            self.rect = assets[self.boxImage].get_rect(center=(x, y))
+        else:            
+            self.rect = assets[self.boxImage].get_rect(topleft=(x, y))
+
+        self.image = None
+        Text.reload(self, False)
+
+        self.selected = False
+        self.type = "TextBox"
+
+    def reload(self):
+        Text.reload(self, False)
+
+    def display(self, window):
+        window.blit(assets[self.boxImage], self.rect)
+        window.blit(self.image, (self.rect.x + self.border[0], self.rect.y + self.border[1]))
+
+    def select(self, pos=None, clicked_button=None) -> bool:
+        if pos is None:
+            pos = pg.mouse.get_pos()
+        x, y = pos
+        mouseDown = pg.mouse.get_pressed()
+        if clicked_button is None:
+            if True in mouseDown:
+                mouseDown = True
+            else:
+                mouseDown = False
+        else:
+            mouseDown = mouseDown[clicked_button]
+
+        if self.rect.collidepoint((x, y)) and mouseDown:
+            self.selected = True
+        elif not self.rect.collidepoint((x, y)) and mouseDown:
+            self.selected = False
+
+        return self.selected
+    
+    def update_text(self, event):
+        """Call inside event loop"""
+        if event.type != pg.KEYDOWN or not self.selected:
+            return
+        if event.key == pg.K_BACKSPACE:
+            self.text = self.text[:-2]
+            self.text += "|"
+        else:
+            self.text = self.text[:-1]
+            self.text += event.unicode
+            self.text += "|"
+        self.reload()
+
+    def pack(self, window_width, window_height):
+        Text.pack(self, window_width, window_height)
+
+    def unpack(self, window_width, window_height):
+        Text.unpack(self, window_width, window_height)
+
+
+        
+
