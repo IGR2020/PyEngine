@@ -11,3 +11,4 @@ This is a simple app to make GUI for pygame apps easily and to add other feature
 + Pickle based object saving and loading
 + Text object
 + Text object renaming
++ TextBox
