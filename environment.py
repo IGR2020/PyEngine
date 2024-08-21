@@ -110,7 +110,6 @@ def updateEnvironment(name):
     shutil.copy("engineFunctions.py", f"{name}/")
     shutil.copy("objects.py", f"{name}/")
 
-    createStarterScript(f"{name}/main.py", name)
     createAssetsFile(f"{name}/assets.py")
 
 

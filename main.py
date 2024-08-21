@@ -4,6 +4,7 @@ from objects import *
 from environment import *
 from os.path import isdir
 from assets import *
+from config import *
 
 
 window = pg.display.set_mode((1000, 600), flags=pg.RESIZABLE)
@@ -109,6 +110,10 @@ def display():
         ),
     )
 
+    # config handler
+    if configHandler is not None and selected_object is not None:
+        configHandler.display(window)
+
     # object buttons
     for button in object_buttons:
         button.display(window)
@@ -125,8 +130,9 @@ def display():
 # button and shortcut key functionality
 # delete object
 def deleteObject():
-    global selected_object, objects
+    global selected_object, objects, configHandler
     if selected_object is not None:
+        configHandler = None
         objects.pop(selected_object)
         selected_object += 1
         if selected_object >= len(objects):
@@ -149,6 +155,9 @@ def saveObjects():
         obj.unpack(game_width, game_height)
 
 
+# config
+configHandler = None
+
 # main script
 while run:
 
@@ -165,6 +174,9 @@ while run:
         if event.type == pg.QUIT:
             run = False
 
+        if configHandler is not None and selected_object is not None:
+            configHandler.event(event)
+
         if event.type == pg.VIDEORESIZE:
             window_width, window_height = event.dict["size"]
 
@@ -177,11 +189,21 @@ while run:
                     break
                 if obj.rect.collidepoint((mouse_x, mouse_y)):
                     selected_object = i
+                    
+                    # setting up config handler
+                    try:
+                        configHandler = configMap[obj.type](obj, command_actions_div_rect.right, config_menu_div_rect.bottom)
+                    except:
+                        configHandler = BaseConfig(obj, command_actions_div_rect.right, config_menu_div_rect.bottom)
+
+
                     break
-            else:
-                selected_object = None
+
+
 
         if event.type == pg.KEYDOWN:
+            if not configHandler.allow_actions:
+                continue
             if selected_object is not None and objects[selected_object].type == "Text" and event.key != pg.K_DELETE and event.key != pg.K_ESCAPE:
                 if event.key == pg.K_BACKSPACE:
                     objects[selected_object].text = objects[selected_object].text[:-1]
@@ -196,6 +218,10 @@ while run:
                 deleteObject()
             elif event.key == pg.K_s:
                 saveObjects()
+
+    # config handler
+    if configHandler is not None and selected_object is not None:
+        configHandler.modify()
 
     # button animation
     upload_button.clicked()

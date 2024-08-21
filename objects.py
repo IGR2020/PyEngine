@@ -4,6 +4,7 @@ from assets import *
 class Package:
     def __init__(self) -> None:
         self.realPos = 0, 0
+        self.name = "Undefiend"
     
     def pack(self, window_width, window_height):
         self.realPos = self.rect.x / window_width, self.rect.y / window_height
@@ -161,18 +162,22 @@ class Text(Package):
         window.blit(self.image, self.rect)
 
 class TextBox(Package):
-    def __init__(self,  imageName, border: tuple[int, int], x, y, color, size, font,  center=False) -> None:
+    def __init__(self,  imageName, border: tuple[int, int] | int, x, y, color, size, font, text="", center=False) -> None:
         
         # saving reconstruction data
         super().__init__()
-        self.text = "|"
+        self.text = text
         self.color = color
         self.size = size
         self.font = font
 
 
         self.boxImage = imageName
-        self.border = border
+
+        if isinstance(border, int):
+            self.border = (border, border)   
+        else:         
+            self.border = border
 
         if center:
             self.rect = assets[self.boxImage].get_rect(center=(x, y))
@@ -217,13 +222,13 @@ class TextBox(Package):
         if event.type != pg.KEYDOWN or not self.selected:
             return
         if event.key == pg.K_BACKSPACE:
-            self.text = self.text[:-2]
+            self.text = self.text[:-1]
             self.text += "|"
         else:
-            self.text = self.text[:-1]
             self.text += event.unicode
             self.text += "|"
         self.reload()
+        self.text = self.text[:-1]
 
     def pack(self, window_width, window_height):
         Text.pack(self, window_width, window_height)
