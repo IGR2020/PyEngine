@@ -12,3 +12,6 @@ This is a simple app to make GUI for pygame apps easily and to add other feature
 + Text object
 + Text object renaming
 + TextBox
+
+## Beta 3
++ Object configuration (base config)
