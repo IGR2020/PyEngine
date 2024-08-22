@@ -162,7 +162,7 @@ class Text(Package):
         window.blit(self.image, self.rect)
 
 class TextBox(Package):
-    def __init__(self,  imageName, border: tuple[int, int] | int, x, y, color, size, font, text="", center=False) -> None:
+    def __init__(self,  imageName, selectedImageName, border: tuple[int, int] | int, x, y, color, size, font, text="", center=False) -> None:
         
         # saving reconstruction data
         super().__init__()
@@ -173,6 +173,7 @@ class TextBox(Package):
 
 
         self.boxImage = imageName
+        self.selectedBoxName = selectedImageName
 
         if isinstance(border, int):
             self.border = (border, border)   
@@ -194,7 +195,10 @@ class TextBox(Package):
         Text.reload(self, False)
 
     def display(self, window):
-        window.blit(assets[self.boxImage], self.rect)
+        if self.selected:
+            window.blit(assets[self.selectedBoxName], self.rect)
+        else:            
+            window.blit(assets[self.boxImage], self.rect)
         window.blit(self.image, (self.rect.x + self.border[0], self.rect.y + self.border[1]))
 
     def select(self, pos=None, clicked_button=None) -> bool:
@@ -223,6 +227,9 @@ class TextBox(Package):
             return
         if event.key == pg.K_BACKSPACE:
             self.text = self.text[:-1]
+            self.text += "|"
+        elif event.unicode == "\r":
+            self.selected = False
             self.text += "|"
         else:
             self.text += event.unicode

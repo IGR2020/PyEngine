@@ -202,9 +202,7 @@ while run:
 
 
         if event.type == pg.KEYDOWN:
-            if not configHandler.allow_actions:
-                continue
-            if selected_object is not None and objects[selected_object].type == "Text" and event.key != pg.K_DELETE and event.key != pg.K_ESCAPE:
+            if configHandler is not None and configHandler.allowObjectModification and selected_object is not None and objects[selected_object].type == "Text" and event.key != pg.K_DELETE and event.key != pg.K_ESCAPE:
                 if event.key == pg.K_BACKSPACE:
                     objects[selected_object].text = objects[selected_object].text[:-1]
                 else:
@@ -214,7 +212,7 @@ while run:
                 continue
             elif event.key == pg.K_ESCAPE:
                 selected_object = None
-            elif event.key == pg.K_DELETE or event.key == pg.K_BACKSPACE:
+            elif event.key == pg.K_DELETE or event.key == pg.K_BACKSPACE and configHandler.allowObjectModification:
                 deleteObject()
             elif event.key == pg.K_s:
                 saveObjects()
@@ -266,6 +264,7 @@ while run:
                 objects.append(
                     TextBox(
                         "Blank TextBox",
+                        "Blank TextBox Selected"
                         (1, 1),
                         game_width/2,
                         game_height/2,
@@ -280,7 +279,7 @@ while run:
     mouse_rel_x, mouse_rel_y = pg.mouse.get_rel()
     left_mouse_button_down = pg.mouse.get_pressed()[0]
     if left_mouse_button_down:
-        if selected_object is not None:
+        if selected_object is not None and configHandler is not None and configHandler.allowObjectReposition:
             objects[selected_object].rect.x += mouse_rel_x
             objects[selected_object].rect.y += mouse_rel_y
 
