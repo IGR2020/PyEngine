@@ -1,8 +1,6 @@
 """GUI for pygame (2.5.2 or beyond)"""
 
 import pygame as pg
-from pyautogui import mouseDown
-from pygame.examples.sprite_texture import event
 
 from assets import assets
 
@@ -14,13 +12,14 @@ class BasicObject:
         self.rect = pg.Rect(x, y, image.get_width(), image.get_height())
         self.name = name
 
-    def display(self, window: pg.Surface, x_offset: int, y_offset: int):
+    def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         window.blit(assets[self.name], (self.rect.x - x_offset, self.rect.y - y_offset))
 
 
 class Button(BasicObject):
-    def __init__(self, x: int, y: int, releasedImageName: str, pressedImageName: str, mouseButtonAccepted: str | int = None):
-        """mouseButtonAccepted argument allows for you to check for only certain mouse button presses, possible arguments are 'left', 'right', 'middle', 0, 1, 2"""
+    def __init__(self, x: int, y: int, releasedImageName: str, pressedImageName: str, mouseButtonAccepted: str | int = None, data=None):
+        """mouseButtonAccepted argument allows for you to check for only certain mouse button presses, possible arguments are 'left', 'right', 'middle', 0, 1, 2
+        \nPlace any associated data of the button as the data argument"""
         super().__init__(x, y, releasedImageName)
 
         self.releasedImageName = releasedImageName
