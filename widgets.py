@@ -56,6 +56,8 @@ class Button(BasicObject):
 
         self.mouseButtonAccepted = mouseButtonAccepted
 
+        self.data = data
+
     def clicked(self, event, *args) -> bool:
         """Call within event loop under the if condition of pg.MOUSEBUTTONDOWN"""
         mousePos = pg.mouse.get_pos()
@@ -67,6 +69,7 @@ class Button(BasicObject):
             self.rect.y += self.heightDifference
             return True
 
+        self.pressed = False
         return False
 
     def released(self, *args):
@@ -138,7 +141,7 @@ class Label(ObjectGroup, Button):
             self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer))
 
             assets[f"Stretched {clickedLabelName}"] = pg.transform.scale(assets[clickedLabelName], (
-            self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer))
+            self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer - self.heightDifference))
 
             self.releasedImageName = f"Stretched {labelName}"
             self.pressedImageName = f"Stretched {clickedLabelName}"
@@ -150,3 +153,15 @@ class Label(ObjectGroup, Button):
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         Button.display(self, window, x_offset, y_offset)
         ObjectGroup.display(self, window, x_offset, y_offset)
+
+    def clicked(self, event, *args) -> bool:
+        val = Button.clicked(self, event, *args)
+        if val:
+            self.objects[0].rect.y += self.heightDifference
+        return val
+
+    def released(self, *args):
+        val = Button.released(self, *args)
+        if val:
+            self.objects[0].rect.y -= self.heightDifference
+        return val
