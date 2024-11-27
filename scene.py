@@ -7,17 +7,22 @@ class Scene:
             name: str = "PyEngine",
             fps: int = 60,
             background: tuple[int, int, int] = (255, 255, 255),
+            embedded=False
     ):
         self.width, self.height = resolution
         self.name = name
-        self.window = pg.display.set_mode(resolution, flags=pg.RESIZABLE)
+        if embedded:
+            self.window = pg.Surface(resolution)
+        else:
+            self.window = pg.display.set_mode(resolution, flags=pg.RESIZABLE)
+            pg.display.set_caption(name)
         self.fps = fps
         self.clock = pg.time.Clock()
         self.run = True
         self.background = background
-        pg.display.set_caption(name)
-        self.widgets = []
         self.deltaTime = 0
+
+        self.objects = []
 
         self.onInit()
 
@@ -31,7 +36,8 @@ class Scene:
 
     def debug(self): ...
 
-    def videoResize(self): ...
+    def videoResize(self):
+        """self.width and self.height are automatically updated, use them for rescaling"""
 
     def mouseDown(self, event): ...
 

@@ -3,6 +3,7 @@ from tkinter.filedialog import askdirectory
 from scene import Scene
 from widgets import Button, Label
 
+tabBarHeight = 55
 
 class EngineScene(Scene):
     def onInit(self):
@@ -12,10 +13,14 @@ class EngineScene(Scene):
             quit()
         self.tabs = [
             Label(0, 0, "Unclicked Tab", "Scene", (255, 255, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
-                  stretchBuffer=20)]
+                  stretchBuffer=20, data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True))]
 
     def display(self) -> None:
-        [tab.display(self.window) for tab in self.tabs]
+        for tab in self.tabs:
+            tab.data.display()
+            self.window.blit(tab.data.window, (0, tabBarHeight))
+            tab.display(self.window)
+
 
     def mouseDown(self, event):
         [tab.clicked(event) for tab in self.tabs]

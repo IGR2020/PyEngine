@@ -127,11 +127,11 @@ class Text:
 
 class Label(ObjectGroup, Button):
     def __init__(self, x: int, y, labelName, text, color: tuple[int, int, int], size, font,
-                 clickedLabelName: str = None, stretchToFit=False, stretchBuffer=0):
+                 clickedLabelName: str = None, stretchToFit=False, stretchBuffer=0, data=None):
         if clickedLabelName is None: clickedLabelName = labelName
 
         ObjectGroup.__init__(self)
-        Button.__init__(self, x, y, labelName, clickedLabelName)
+        Button.__init__(self, x, y, labelName, clickedLabelName, data=data)
         self.objects.append(
             Text(text, self.rect.centerx, self.rect.centery, color, size, font, center=True)
         )
