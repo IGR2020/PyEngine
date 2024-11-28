@@ -43,6 +43,8 @@ class Scene:
 
     def mouseUp(self, event): ...
 
+    def scroll(self, event): ...
+
     def quit(self):
         """Use this function if you want to return something from the [game].start() function"""
 
@@ -66,6 +68,9 @@ class Scene:
 
                 if event.type == pg.MOUSEBUTTONUP:
                     self.mouseUp(event)
+
+                if event.type == pg.MOUSEWHEEL:
+                    self.scroll(event)
 
                 self.event(event)
 

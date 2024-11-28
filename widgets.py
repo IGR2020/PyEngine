@@ -17,11 +17,13 @@ class BasicObject:
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         window.blit(assets[self.name], (self.rect.x - x_offset, self.rect.y - y_offset))
 
+    def updateOwnedObjects(self): ...
+
 
 class ObjectGroup:
-    def __init__(self):
+    def __init__(self, x: int = 0, y: int = 0):
         self.objects = []
-        self.rect = pg.Rect(1, 1, 1, 1)
+        self.rect = pg.Rect(x, y, 1, 1)
 
     def setRect(self):
         for obj in self.objects:
@@ -37,6 +39,8 @@ class ObjectGroup:
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         for obj in self.objects:
             obj.display(window, x_offset, y_offset)
+
+    def updateOwnedObjects(self): ...
 
 
 class Button(BasicObject):
@@ -138,10 +142,11 @@ class Label(ObjectGroup, Button):
 
         if stretchToFit:
             assets[f"Stretched {labelName}"] = pg.transform.scale(assets[labelName], (
-            self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer))
+                self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer))
 
             assets[f"Stretched {clickedLabelName}"] = pg.transform.scale(assets[clickedLabelName], (
-            self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer - self.heightDifference))
+                self.objects[0].rect.width + stretchBuffer,
+                self.objects[0].rect.height + stretchBuffer - self.heightDifference))
 
             self.releasedImageName = f"Stretched {labelName}"
             self.pressedImageName = f"Stretched {clickedLabelName}"
@@ -165,3 +170,81 @@ class Label(ObjectGroup, Button):
         if val:
             self.objects[0].rect.y -= self.heightDifference
         return val
+
+    def updateOwnedObjects(self):
+        self.objects[0].rect.center = self.rect.center
+
+
+class Hotbar(ObjectGroup):
+    def __init__(self, x: int, y: int, objects: list[ObjectGroup | BasicObject | Text], stackOrientation: str | int,
+                 scrollMin: int = 0, scrollMax: int = 0):
+        """Define stackOrientation as either vertical or horizontal, or 0 and 1 respectively
+        \nscrollMin is for the maximum scroll to the left and scrollMax is for the maximum scroll to the right, NOTE: scrollMin and Max are not relative to original position, but the x itself"""
+        super().__init__(x, y)
+
+        if isinstance(stackOrientation, int):
+            if stackOrientation == 1:
+                stackOrientation = "horizontal"
+            else:
+                stackOrientation = "vertical"
+        self.stackOrientation = stackOrientation.lower()
+
+        self.scrollMin = scrollMin
+        self.scrollMax = scrollMax
+
+        [self.objects.append(obj) for obj in objects]
+
+        if self.stackOrientation == "horizontal":
+            self.stackHorizontal()
+        else:
+            self.stackVertical()
+
+    def stackHorizontal(self):
+        for i, obj in enumerate(self.objects):
+            if i == 0:
+                obj.rect.topleft = self.rect.topleft
+                obj.updateOwnedObjects()
+                continue
+
+            obj.rect.left = self.objects[i - 1].rect.right
+            obj.updateOwnedObjects()
+
+
+    def stackVertical(self):
+        for i, obj in enumerate(self.objects):
+            if i == 0:
+                obj.rect.topleft = self.rect.topleft
+                obj.updateOwnedObjects()
+                continue
+
+            obj.rect.top = self.objects[i - 1].rect.bottom
+            obj.updateOwnedObjects()
+
+    def updateX(self, x: int):
+        self.rect.x = x
+        if self.stackOrientation == "horizontal":
+            self.stackHorizontal()
+        else:
+            self.stackVertical()
+
+    def updateY(self, y: int):
+        self.rect.y = y
+        if self.stackOrientation == "horizontal":
+            self.stackHorizontal()
+        else:
+            self.stackVertical()
+
+    def scroll(self, event, limitScroll: bool, scrollFactor: int = 10):
+        """This is to be called withing the event for loop, under the if event.type == pg.MOUSEWHEEL: i.e when working with scenes under the scroll function
+        \nlimitScroll if false allows the player to scroll the hotbar off-screen, while limiting is based on what the scroll min and scroll max were defined as in the __init__
+        \nscrollMin is for the maximum scroll to the left and scrollMax is for the maximum scroll to the right"""
+        if self.stackOrientation == "horizontal":
+            self.updateX(self.rect.x + ((event.y + event.x) * scrollFactor))
+        else:
+            self.updateY(self.rect.y + ((event.y + event.x) * scrollFactor))
+
+        if limitScroll:
+            if self.stackOrientation == "horizontal":
+                self.updateX(min(max(self.rect.x, self.scrollMin), self.scrollMax))
+            else:
+                self.updateY(min(max(self.rect.y, self.scrollMin), self.scrollMax))
