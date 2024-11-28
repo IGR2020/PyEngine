@@ -32,15 +32,16 @@ class ObjectGroup:
             if obj.rect.y < self.rect.y:
                 self.rect.y = obj.rect.y
             if obj.rect.right > self.rect.right:
-                self.rect.right = obj.rect.right
+                self.rect.width = obj.rect.right - self.rect.x
             if obj.rect.bottom > self.rect.bottom:
-                self.rect.bottom = obj.rect.bottom
+                self.rect.height = obj.rect.bottom - self.rect.y
 
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         for obj in self.objects:
             obj.display(window, x_offset, y_offset)
 
-    def updateOwnedObjects(self): ...
+    def updateOwnedObjects(self):
+        ...
 
 
 class Button(BasicObject):
@@ -199,6 +200,18 @@ class Hotbar(ObjectGroup):
         else:
             self.stackVertical()
 
+        self.setRect()
+
+        if self.stackOrientation == "horizontal":
+            self.scrollMax = max(self.scrollMin, self.scrollMax - self.objects[0].rect.width)
+        else:
+            self.scrollMax = max(self.scrollMin, self.scrollMax - self.objects[0].rect.height)
+
+        if self.stackOrientation == "horizontal":
+            self.scrollMin = min(self.scrollMax, self.scrollMin + self.objects[-1].rect.width - self.rect.width)
+        else:
+            self.scrollMin = min(self.scrollMax, self.scrollMin + self.objects[-1].rect.height - self.rect.height)
+
     def stackHorizontal(self):
         for i, obj in enumerate(self.objects):
             if i == 0:
@@ -208,7 +221,6 @@ class Hotbar(ObjectGroup):
 
             obj.rect.left = self.objects[i - 1].rect.right
             obj.updateOwnedObjects()
-
 
     def stackVertical(self):
         for i, obj in enumerate(self.objects):

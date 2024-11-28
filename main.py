@@ -1,7 +1,7 @@
 from scene import Scene
 from widgets import Label, Hotbar
 
-tabBarHeight = 55
+tabBarHeight = 56
 
 
 class EngineScene(Scene):
@@ -13,7 +13,11 @@ class EngineScene(Scene):
         self.tabs = Hotbar(0, 0, [
             Label(0, 0, "Unclicked Tab", "Scene", (255, 255, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
                   stretchBuffer=20,
-                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True))], "horizontal",
+                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True)),
+            Label(0, 0, "Unclicked Tab", "Scene", (255, 255, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
+                  stretchBuffer=20,
+                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True))
+        ], "horizontal",
                            scrollMin=0, scrollMax=self.width)
         self.selectedTab = 0
 
@@ -32,7 +36,7 @@ class EngineScene(Scene):
                 self.selectedTab = i
 
     def scroll(self, event):
-        self.tabs.scroll(event, True)
+        self.tabs.scroll(event, True, 12)
 
 
 if __name__ == "__main__":
