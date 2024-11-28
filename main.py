@@ -11,18 +11,18 @@ class EngineScene(Scene):
         if len(self.projectPath) == 0:
             quit()
         self.tabs = Hotbar(0, 0, [
-            Label(0, 0, "Unclicked Tab", "Scene", (255, 255, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
+            Label(0, 0, "Unclicked Tab", "Scene", (255, 100, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
                   stretchBuffer=20,
-                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True)),
-            Label(0, 0, "Unclicked Tab", "Scene", (255, 255, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
+                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True, background=(255, 100, 255))),
+            Label(0, 0, "Unclicked Tab", "Scene", (150, 255, 255), 25, "Arialblack", "Clicked Tab", stretchToFit=True,
                   stretchBuffer=20,
-                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True))
+                  data=Scene((self.width, self.height - tabBarHeight), "Untitled Scene", embedded=True, background=(150, 255, 255)))
         ], "horizontal",
                            scrollMin=0, scrollMax=self.width)
         self.selectedTab = 0
 
     def display(self) -> None:
-        self.tabs.objects[self.selectedTab].data.display()
+        self.tabs.objects[self.selectedTab].data.renderFrame()
         self.window.blit(self.tabs.objects[self.selectedTab].data.window, (0, tabBarHeight))
         for tab in self.tabs.objects:
             tab.display(self.window)
@@ -37,6 +37,11 @@ class EngineScene(Scene):
 
     def scroll(self, event):
         self.tabs.scroll(event, True, 12)
+
+    def videoResize(self):
+        self.tabs.scrollMax = self.width
+        self.tabs.scrollMin = 0
+        self.tabs.updateLimitScroll()
 
 
 if __name__ == "__main__":

@@ -200,6 +200,10 @@ class Hotbar(ObjectGroup):
         else:
             self.stackVertical()
 
+        self.updateLimitScroll()
+
+    def updateLimitScroll(self):
+        """WARNING: make sure that you have updated both the scrollMin and scrollMax before calling this function"""
         self.setRect()
 
         if self.stackOrientation == "horizontal":

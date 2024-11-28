@@ -45,6 +45,11 @@ class Scene:
 
     def scroll(self, event): ...
 
+    def renderFrame(self):
+        """This function is only used for embedded scenes so that the display output may be displayed"""
+        self.window.fill(self.background)
+        self.display()
+
     def quit(self):
         """Use this function if you want to return something from the [game].start() function"""
 
