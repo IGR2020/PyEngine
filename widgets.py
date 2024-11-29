@@ -42,6 +42,26 @@ class ObjectGroup:
 
     def updateOwnedObjects(self):
         ...
+    
+    def stackHorizontal(self):
+        for i, obj in enumerate(self.objects):
+            if i == 0:
+                obj.rect.topleft = self.rect.topleft
+                obj.updateOwnedObjects()
+                continue
+
+            obj.rect.left = self.objects[i - 1].rect.right
+            obj.updateOwnedObjects()
+
+    def stackVertical(self):
+        for i, obj in enumerate(self.objects):
+            if i == 0:
+                obj.rect.topleft = self.rect.topleft
+                obj.updateOwnedObjects()
+                continue
+
+            obj.rect.top = self.objects[i - 1].rect.bottom
+            obj.updateOwnedObjects()
 
 
 class Button(BasicObject):
@@ -131,8 +151,10 @@ class Text:
 
 
 class Label(ObjectGroup, Button):
+    """A dynamic widget, usable as a text box, button and label"""
+
     def __init__(self, x: int, y, labelName, text, color: tuple[int, int, int], size, font,
-                 clickedLabelName: str = None, stretchToFit=False, stretchBuffer=0, data=None):
+                 clickedLabelName: str = None, validTextInputs: str = None, stretchToFit=False, stretchBuffer=0, data=None):
         if clickedLabelName is None: clickedLabelName = labelName
 
         ObjectGroup.__init__(self)
@@ -141,24 +163,54 @@ class Label(ObjectGroup, Button):
             Text(text, self.rect.centerx, self.rect.centery, color, size, font, center=True)
         )
 
+        self.originalReleasedImageName = labelName
+        self.originalPressedImageName = clickedLabelName
+        self.stretchToFit = stretchToFit
+        self.stretchBuffer = stretchBuffer
+
         if stretchToFit:
-            assets[f"Stretched {labelName}"] = pg.transform.scale(assets[labelName], (
+            assets[f"Stretched {labelName} {id(self)}"] = pg.transform.scale(assets[labelName], (
                 self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer))
 
             assets[f"Stretched {clickedLabelName}"] = pg.transform.scale(assets[clickedLabelName], (
                 self.objects[0].rect.width + stretchBuffer,
                 self.objects[0].rect.height + stretchBuffer - self.heightDifference))
 
-            self.releasedImageName = f"Stretched {labelName}"
-            self.pressedImageName = f"Stretched {clickedLabelName}"
+            self.releasedImageName = f"Stretched {labelName} {id(self)}"
+            self.pressedImageName = f"Stretched {clickedLabelName} {id(self)}"
 
             Button.reload(self)
 
         self.objects[0].rect.center = self.rect.center
 
+        if validTextInputs is None:
+            self.validTextInputs = "qwertyuiopasdfghjklzxcvbnm,./;'[]-=1234567890`~!@#$%^&*()_+}{|:\"<>?\\"
+        else:
+            self.validTextInputs = validTextInputs
+
+    def stretch(self):
+        assets[f"Stretched {self.originalReleasedImageName} {id(self)}"] = pg.transform.scale(assets[self.originalReleasedImageName], (
+            self.objects[0].rect.width + self.stretchBuffer, self.objects[0].rect.height + self.stretchBuffer))
+
+        assets[f"Stretched {self.originalPressedImageName}"] = pg.transform.scale(assets[self.originalPressedImageName], (
+            self.objects[0].rect.width + self.stretchBuffer,
+            self.objects[0].rect.height + self.stretchBuffer - self.heightDifference))
+
+        self.releasedImageName = f"Stretched {self.originalReleasedImageName} {id(self)}"
+        self.pressedImageName = f"Stretched {self.originalPressedImageName} {id(self)}"
+
+        Button.reload(self)
+
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         Button.display(self, window, x_offset, y_offset)
         ObjectGroup.display(self, window, x_offset, y_offset)
+
+    def textUpdate(self, event):
+        """Expects event to be from under the if event.type == pg.KEYDOWN within the for loop, if using scenes under the keydown function"""
+        if event.unicode == pg.K_BACKSPACE:
+            self.objects[0].text = self.objects[0].text[:-1]
+        else:
+            self.objects[0].text += event.unicode
 
     def clicked(self, event, *args) -> bool:
         val = Button.clicked(self, event, *args)
@@ -216,26 +268,6 @@ class Hotbar(ObjectGroup):
         else:
             self.scrollMin = min(self.scrollMax, self.scrollMin + self.objects[-1].rect.height - self.rect.height)
 
-    def stackHorizontal(self):
-        for i, obj in enumerate(self.objects):
-            if i == 0:
-                obj.rect.topleft = self.rect.topleft
-                obj.updateOwnedObjects()
-                continue
-
-            obj.rect.left = self.objects[i - 1].rect.right
-            obj.updateOwnedObjects()
-
-    def stackVertical(self):
-        for i, obj in enumerate(self.objects):
-            if i == 0:
-                obj.rect.topleft = self.rect.topleft
-                obj.updateOwnedObjects()
-                continue
-
-            obj.rect.top = self.objects[i - 1].rect.bottom
-            obj.updateOwnedObjects()
-
     def updateX(self, x: int):
         self.rect.x = x
         if self.stackOrientation == "horizontal":
@@ -264,3 +296,15 @@ class Hotbar(ObjectGroup):
                 self.updateX(min(max(self.rect.x, self.scrollMin), self.scrollMax))
             else:
                 self.updateY(min(max(self.rect.y, self.scrollMin), self.scrollMax))
+
+class AttributeEdit(ObjectGroup):
+    def __init__(self, editTypes: list[int, str, bool]):
+        super().__init__()
+
+    def tick(self): ...
+
+    def scroll(self, event): ...
+
+    def mouseDown(self, event): ...
+
+    def mouseUp(self, event): ...
