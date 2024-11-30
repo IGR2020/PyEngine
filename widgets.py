@@ -42,7 +42,7 @@ class ObjectGroup:
 
     def updateOwnedObjects(self):
         ...
-    
+
     def stackHorizontal(self):
         for i, obj in enumerate(self.objects):
             if i == 0:
@@ -172,7 +172,7 @@ class Label(ObjectGroup, Button):
             assets[f"Stretched {labelName} {id(self)}"] = pg.transform.scale(assets[labelName], (
                 self.objects[0].rect.width + stretchBuffer, self.objects[0].rect.height + stretchBuffer))
 
-            assets[f"Stretched {clickedLabelName}"] = pg.transform.scale(assets[clickedLabelName], (
+            assets[f"Stretched {clickedLabelName} {id(self)}"] = pg.transform.scale(assets[clickedLabelName], (
                 self.objects[0].rect.width + stretchBuffer,
                 self.objects[0].rect.height + stretchBuffer - self.heightDifference))
 
@@ -207,10 +207,15 @@ class Label(ObjectGroup, Button):
 
     def textUpdate(self, event):
         """Expects event to be from under the if event.type == pg.KEYDOWN within the for loop, if using scenes under the keydown function"""
-        if event.unicode == pg.K_BACKSPACE:
+        if event.key == pg.K_BACKSPACE:
             self.objects[0].text = self.objects[0].text[:-1]
-        else:
+        elif event.unicode in self.validTextInputs:
             self.objects[0].text += event.unicode
+        self.objects[0].reload()
+        if self.stretchToFit:
+            self.stretch()
+        else:
+            self.reload()
 
     def clicked(self, event, *args) -> bool:
         val = Button.clicked(self, event, *args)
@@ -297,13 +302,33 @@ class Hotbar(ObjectGroup):
             else:
                 self.updateY(min(max(self.rect.y, self.scrollMin), self.scrollMax))
 
-class AttributeEdit(ObjectGroup):
-    def __init__(self, editTypes: list[int, str, bool]):
-        super().__init__()
+class AttributeEdit(Hotbar):
+    """Allows one to easily get user data for basic types such as int, string, bool, etc. (work in progress)"""
 
-    def tick(self): ...
+    def __init__(self, x, y, inputTypes: dict[str, type[str]], themeSize: int, themeColor: tuple[int, int, int], labelName: str, stackOrientation: str, clickedLabelName: str = None, validTextInputs: str = None, themeFont: str = "Arialblack", scrollMin: int = 0, scrollMax: int = 0, stretchToFit: bool = False, stretchBuffer: int = 0):
 
-    def scroll(self, event): ...
+        objects = []
+        for inputName in inputTypes:
+            if inputTypes[inputName] == str:
+                objects.append(Text(inputName, x, y, themeColor, themeSize, themeFont))
+                objects.append(Label(x, y, labelName, "", themeColor, themeSize, themeFont, stretchToFit=stretchToFit, stretchBuffer=stretchBuffer, clickedLabelName=clickedLabelName, validTextInputs=validTextInputs))
+
+        super().__init__(x, y, objects, stackOrientation, scrollMin, scrollMax)
+
+        self.inputTypes = list(inputTypes.values())
+        self.objectOutput = [None for _ in range(len(self.inputTypes))]
+
+    def tick(self):
+        for i, inputName in enumerate(self.inputTypes):
+            objectIndex = i*2 + 1
+            if inputName == str:
+                self.objectOutput[i] = self.objects[objectIndex].objects[0].text
+
+    def keyDown(self, event):
+        for i, inputName in enumerate(self.inputTypes):
+            objectIndex = i*2 + 1
+            if inputName == str:
+                self.objects[objectIndex].textUpdate(event)
 
     def mouseDown(self, event): ...
 

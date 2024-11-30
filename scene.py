@@ -45,6 +45,8 @@ class Scene:
 
     def scroll(self, event): ...
 
+    def keyDown(self, event): ...
+
     def renderFrame(self):
         """This function is only used for embedded scenes so that the display output may be displayed"""
         self.window.fill(self.background)
@@ -60,9 +62,12 @@ class Scene:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.run = False
-                if event.type == pg.KEYDOWN and event.key == pg.K_F3:
-                    print(f"[Graphics] delta time {self.deltaTime}")
-                    self.debug()
+                if event.type == pg.KEYDOWN:
+                    self.keyDown(event)
+
+                    if event.key == pg.K_F3:
+                        print(f"[Graphics] delta time {self.deltaTime}")
+                        self.debug()
 
                 if event.type == pg.VIDEORESIZE:
                     self.width, self.height = event.dict["size"]

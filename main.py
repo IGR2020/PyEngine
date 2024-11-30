@@ -1,5 +1,5 @@
 from scene import Scene
-from widgets import Label, Hotbar
+from widgets import Label, Hotbar, AttributeEdit
 
 tabBarHeight = 56
 sceneResolution = 900, 500
@@ -20,6 +20,8 @@ class EngineScene(Scene):
         ], "horizontal",
                            scrollMin=0, scrollMax=self.width)
         self.selectedTab = 0
+
+
 
     def display(self) -> None:
         self.tabs.objects[self.selectedTab].data.renderFrame()
@@ -43,6 +45,8 @@ class EngineScene(Scene):
         self.tabs.scrollMin = 0
         self.tabs.updateLimitScroll()
 
+    def keyDown(self, event):
+        ...
 
 if __name__ == "__main__":
     engineInstance = EngineScene((sceneResolution[0], sceneResolution[1]+tabBarHeight))
