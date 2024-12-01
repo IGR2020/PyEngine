@@ -149,6 +149,9 @@ class Text:
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0):
         window.blit(self.image, (self.rect.x - x_offset, self.rect.y - y_offset))
 
+    def updateOwnedObjects(self):
+        ...
+
 
 class Label(ObjectGroup, Button):
     """A dynamic widget, usable as a text box, button and label"""
@@ -184,9 +187,10 @@ class Label(ObjectGroup, Button):
         self.objects[0].rect.center = self.rect.center
 
         if validTextInputs is None:
-            self.validTextInputs = "qwertyuiopasdfghjklzxcvbnm,./;'[]-=1234567890`~!@#$%^&*()_+}{|:\"<>?\\"
+            self.validTextInputs = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNMN,./;'[]-=1234567890`~!@#$%^&*()_+}{|:\"<>?\\"
         else:
             self.validTextInputs = validTextInputs
+        self.is_selected = False
 
     def stretch(self):
         assets[f"Stretched {self.originalReleasedImageName} {id(self)}"] = pg.transform.scale(assets[self.originalReleasedImageName], (
@@ -207,6 +211,8 @@ class Label(ObjectGroup, Button):
 
     def textUpdate(self, event):
         """Expects event to be from under the if event.type == pg.KEYDOWN within the for loop, if using scenes under the keydown function"""
+        if not self.is_selected:
+            return
         if event.key == pg.K_BACKSPACE:
             self.objects[0].text = self.objects[0].text[:-1]
         elif event.unicode in self.validTextInputs:
@@ -221,6 +227,9 @@ class Label(ObjectGroup, Button):
         val = Button.clicked(self, event, *args)
         if val:
             self.objects[0].rect.y += self.heightDifference
+            self.is_selected = True
+        else:
+            self.is_selected = False
         return val
 
     def released(self, *args):
@@ -302,8 +311,10 @@ class Hotbar(ObjectGroup):
             else:
                 self.updateY(min(max(self.rect.y, self.scrollMin), self.scrollMax))
 
+
 class AttributeEdit(Hotbar):
-    """Allows one to easily get user data for basic types such as int, string, bool, etc. (work in progress)"""
+    """Allows one to easily get user data for basic types such as int, string, bool, etc. (only string implemented)
+    \nOutputs will be in a dictionary with the input type names for each input, accessible via AttributeEdit.objectOutput"""
 
     def __init__(self, x, y, inputTypes: dict[str, type[str]], themeSize: int, themeColor: tuple[int, int, int], labelName: str, stackOrientation: str, clickedLabelName: str = None, validTextInputs: str = None, themeFont: str = "Arialblack", scrollMin: int = 0, scrollMax: int = 0, stretchToFit: bool = False, stretchBuffer: int = 0):
 
@@ -316,20 +327,28 @@ class AttributeEdit(Hotbar):
         super().__init__(x, y, objects, stackOrientation, scrollMin, scrollMax)
 
         self.inputTypes = list(inputTypes.values())
-        self.objectOutput = [None for _ in range(len(self.inputTypes))]
+        self.objectOutput = {name: None for name in self.inputTypes}
 
-    def tick(self):
-        for i, inputName in enumerate(self.inputTypes):
-            objectIndex = i*2 + 1
-            if inputName == str:
-                self.objectOutput[i] = self.objects[objectIndex].objects[0].text
+    def tick(self): ...
 
     def keyDown(self, event):
         for i, inputName in enumerate(self.inputTypes):
             objectIndex = i*2 + 1
+
             if inputName == str:
                 self.objects[objectIndex].textUpdate(event)
+                self.objectOutput[inputName] = self.objects[objectIndex].objects[0].text
 
-    def mouseDown(self, event): ...
+    def mouseDown(self, event):
+        for i, inputName in enumerate(self.inputTypes):
+            objectIndex = i*2 + 1
 
-    def mouseUp(self, event): ...
+            if inputName == str:
+                self.objects[objectIndex].clicked(event)
+
+    def mouseUp(self, event):
+        for i, inputName in enumerate(self.inputTypes):
+            objectIndex = i * 2 + 1
+
+            if inputName == str:
+                self.objects[objectIndex].released(event)
